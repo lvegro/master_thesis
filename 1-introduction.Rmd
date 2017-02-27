@@ -1,0 +1,154 @@
+---
+output: pdf_document
+---
+
+# Introduction
+
+## The data landscape
+
+The era we're living in has been called the information age. The progress and
+technological or social changes the development of computing has brought about
+in the last fifty years is enormous, and yet it pales when confronted with the
+advances made in the last few years. In accord with the much celebrated Moore's
+Law, the computational prowess of our machines has risen exponentially year
+after year.
+
+The ever decreasing cost of CPU cycles, data storage and connectivity has made
+it possible that the Internet, once a rather small research network initially
+designed to support physics and other hard-science researchers is now an
+ubiquitous presence and in fact a staple resource of the social and professional
+life of many people.
+
+We as a society can now collect data in an almost
+effortless manner, analyze it faster than ever and even spread the results to
+the whole world within minutes. This new cheapness of the data collecting phase
+of research has caused first an increase in the number of automated sensors
+available, which all together are now being called the Internet of Things. This
+new capability of connecting random, mundane object to the 'Net (seemingly
+"stone age" appliances like fridges, television sets but also mugs and gardening
+pots) has enabled data collecting of social and physical phenomenons previously
+unexplored. 
+
+This is the new frontier, what has been called "Big Data".
+It would be an oversimplification to think of big data simply as the usual data,
+just more. Among the characteristics a data set must have to be considered "big",
+we can mention:
+
+* *high dimensionality*
+* *interconnections with other data sets*
+* *complex structure*
+
+High dimensionality refers of course not only to the number of
+observations but also and foremost to the number of variables considered. An 
+high number of "columns", when thinking of data in the usual tabular form will
+probably generate a number of spurious correlations that traditional statistical
+techniques are not equipped to deal with.
+
+The bounty of data has enabled
+researchers to extend and at the same time focus their interest on subtle
+patterns the identification of which often requires collating various sources.
+The problem of integration and data wrangling is therefore a very important one.
+
+Lastly, technological progress in data collection has made available data that,
+by its very nature, does not adapt well to the tabular metaphor we are used to.
+So called structured data, like scans of texts, road-maps, social network,
+require a completely different and complex analytic framework.
+
+Confronted with this bounty of data, "software", meaning by it both the actual
+computer programs and the "mental software" of the researcher, had to evolve
+too. Advances in high performance computing and parallelism, that enables us to
+split the computation over several machines, together with the development of
+the field of statistical learning, or to use the hip term nowadays,
+*Machine Learning*, has answered this challenges.
+
+The development of statistical learning in particular makes apparent the new
+paradigm. Science used to be mostly about models. Without the right model, data
+is only noise. We're now proceeding towards a point where we need to lose the
+tether of data as something that can be visualized in its totality.
+The aforementioned new developments require us to view data first as a 
+mathematical abstraction not representing anything, before asking what does it
+mean.
+
+Of course there are issues with the new framework. Among the challenges the new
+way of doing things must overcome are the rising importance of spurious
+correlations, and the importance of the distinction between practical and
+statistical significance. It is really important in fields such as bio-medical
+research to control the number of false discoveries, that grows rapidly together
+with the amount of data analyzed. From a technical standpoint, we're reaching
+the edge of our computational and storage capacity and therefore issues like
+scalability and database management, together with the efficiency of compression
+algorithms are also very important.
+
+A further point to consider when applying this innovative techniques is their
+methodological complexity. Because of the size and structures of data as
+well as the intricacies of the actual implementation of the methods, many
+new algorithms can act as "*black boxes*", meaning that they output results
+but the actual steps performed in the calculations, and the logic thereof, is
+not at all clear even to the analyst. Particular attention then must be paid
+to ensure that the users are sufficiently informed to apply the methods with
+judgement and can outweigh the weaknesses of the algorithms acting to balance
+them.
+
+Last but not least this new technologies rise a host of ethical issues, because
+of the possibilities for privacy violation they enable. Be it a
+surveillance state or a private company, it's now possible to track and predict
+individual behavior to an extent never seen before.
+
+## Thesis outline
+
+With this work we will attempt to apply non parametric shape-based change-point 
+detection techniques to sensor data concerning social connections (Phone calls, 
+SMS's, face-to-face meetings). The aim of these methods is to find points
+of abrupt change in the latent structure of a wide variety of data, of which
+social networks are only one. Moreover we will take advantages of novel
+programming tools that enable an average user to produce interactive
+interfaces that can be used to show even non-programmers the intricacies
+of the analysis and to compare the results obtained to the ones that would
+have been obtained if different choices were made by the analyst.
+
+In the second chapter we quickly summarize the essential elements of
+graph theory needed to introduce the network terminology later on. We will pay
+particular attention to the parts important to social network analysis.
+
+In the
+third chapter we  examine the basic framework of social network analysis
+introducing the necessary terminology to allow the analysis of a longitudinal
+network.
+
+In the fourth chapter we then focus our attention to the problem of change-point detection,
+focusing on a particular method that well exemplifies 
+the recent advances allowing them to be applied to more variegate data structures,
+including graph and textual data.
+
+Finally, we propose an application of one of these recent non parametric method to a data set
+[@chen2015graph] to the Social Evolution data set, collected by the MIT Reality Mining Lab [@madan2010social]. 
+This data, collected over 10 months from September 2008 to may 2009, is
+interesting both for the scope and variety of the information collected -- which
+ranges from phone logs to musical tastes -- and for the controversial ethical
+nature of sensor data. The usual analytic report will be accompanied
+by an interactive web-app developed using the **shiny** R package.
+
+The aim of such complicated algorithms is to be able to discern, without the
+need of human supervision, the moments in which the network "fires up" or 
+"goes dark", as well as those in which the important actors change and the
+structure of the network becomes *different*, in some sense, from the way it was
+before. Clearly much of the difficulty in applying these methods successfully
+stems from the very definition of what it means to be *different* for networks,
+and from the problem of finding an effective way of measuring this difference to
+make it discernible to a computerized system.
+
+## Contributions 
+
+The aim of this work is to introduce the basic elements of the theory of
+graphs, which serve as the building blocks for the application of change-point
+detection methods to network data, and to provide an application in R,
+that makes use of the innovative **shiny** package
+to create an interactive dashboard to explore a real-world data set.
+
+Thus the contributions of this work can be summarized as follows:
+
+* We build on @chen2015graph's methodology, applying it to an additional
+real world data set with a rich covariate set, and provide an assessment of
+its effectiveness in identifying abrupt change-points in temporal networks
+* We present an interactive dashboard to serve as a support for exploratory
+analysis and testing of the aforementioned method

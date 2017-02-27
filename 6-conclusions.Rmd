@@ -1,0 +1,75 @@
+---
+output: pdf_document  
+---
+
+# Conclusions
+
+Graphs are extremely complex structures on their own right.
+Labeled graphs, where edges and vertices can carry additional information,
+add another level of complexity. Furthermore, in real world graphs,
+the connections between nodes also include some degree of randomness, some noise
+in the signal. The statistical analysis of data so structured is daunting. Tools
+and techniques to deal with this ever more important data structure are being 
+developed, and the field of social network analysis in particular is very active
+and prolific. In a context such as this, where methods are getting more and more
+complex to deal with the complexity of the data, the availability of effective 
+visualization techniques is of paramount importance.
+
+Modeling data so multifaceted is a demanding endeavour that can only be
+undertaken if one is willing to make several simplification. While recognizing
+that modeling is at the heart of statistical science, it is our opinion that
+in the case of network and other multidimensional, non euclidean data, equal 
+dignity should be given to exploratory analysis. Visualization, in particular,
+can be of great help during the exploration of relatonal data such as networks,
+since the human visual system is a extrordinary data analysis engine.
+
+In this work we tried to show how the use of a suitable interface, that permits
+interactive analysis and visualization and can be easily extended without much
+programming skills can greatly facilitate the knowledge discovery process.
+We leveraged on **shiny** by RStudio to produce a web application that allows
+any user, even if unfamiliar with the R language or the statistical methodology
+Moreover, this interface can easily be bundled with a thesis work or a scientific
+paper in the form of an R package making the analytic process completely 
+reproducible.
+
+The part of this work that deals with the problem of changepoint detection
+in temporal network data can be seen in this light: the method we selected, from
+@chen2015graph, was deceptively simple. The results obtained depend on the 
+choices made by the analyst on the data preparation steps, the distance function
+to use to measure differences in the graphs, the test graph to adoperate as a
+reference measure, the changepoint detection window and possibly other, more
+subtle decisions. We were not able to replicate Chen and Zhang's results on
+data similar to that of their application, and we were able to show that the
+results given by their method appeared to be rather unstable on our data.
+
+In general, in social research, changepoint detection results are not easily
+falsifiable: unless one knows for a fact that there has been an abrupt change,
+it's hard not to try and find a plausible explanation to a detected changepoint
+in good faith, even if it could have been a statistical fluke. Our result
+suggests in our opinion two main further direction of research: the definition of
+graph similarity measures and assessment of network changepoint detection methods
+using simulated data.
+
+Concerning the first point, as was mentioned several times in the course of this
+thesis, the definition of a distance measure between graphs that is both intuitive
+and sensitive to changes in network structure is very complicated. A further
+difficulty is that many available algorithms run in exponential time and are
+for this reason unusable even for medium sized networks.
+
+Regrding method assessment, the use of simulated data to test the robustness
+of results in different conditions is widespread. When the methods to be tested
+concern graphs, however, our ability to use simulated data as a benchmark is
+limited by our current inability to simulate graphs of enough complexity, so 
+that further research is warranted in that direction.
+
+Multidimensional data visualization and analysis is a topic that is gaining much
+traction in recent times. Our application shows that, by using tools easily
+available to the average R programmer, it is possible to build in very short 
+time a fully functional and extensible interactive interface that can serve
+as a support to analyze any sort of data. Applications of this framework
+range from scientific research to data journalism to business dashboard. Our
+own implementation was limited by the fact that it had to run on our personal
+machine. Leveraging on the integration of the R language with other data management
+tools and technologies like DBMS and multi-threaded elaboration, potentially huge
+amounts of data could be analyzed interactively.
+

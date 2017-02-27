@@ -1,0 +1,46 @@
+---
+output: pdf_document
+---
+
+
+\begin{centering}
+
+\vspace{3 cm}
+
+\Huge
+
+{\bf Interactive analysis and visualization of a temporal network}
+
+\vspace{3 cm}
+
+\Large
+Lorenzo Vegro
+
+\vspace{3 cm}
+
+\includegraphics{images/logo}
+
+\normalsize
+March 2016
+
+\vspace{1.5 cm}
+
+\normalsize
+
+\bf{Relatore}:\\
+Prof.ssa Fulvia Pennoni
+
+\normalsize
+\bf{Correlatore}:\\
+Prof. Mirko Cesarini
+
+\vspace{1 cm}
+
+\normalsize
+Scuola di Economia e Statistica
+
+\normalsize
+Universit\`a di Milano-Bicocca
+
+\end{centering}
+

@@ -1,0 +1,16 @@
+---
+output: pdf_document
+---
+
+New technologies allow to monitor social networks through time. Like other
+kinds of relational data, social networks are generally modelled through graphs.
+New techniques are needed in order to analyze this kind of data, and to
+visualize it efficiently. Among the various attempts made to adapt the methods of 
+change-point detection to temporal network, we selected a non-parametric
+graph-based test proposed by Hao Chen and Nancy Zhang in 2015. We applied this
+method to a temporal network of phone calls between university students
+collected during 2008-2009. A **shiny** web-app has been developed, enabling
+analysis and visualization of the data in an interactive way, within a flexible
+and easily extensible framework. This serves both as an exercise in
+reproducible research and allows to test the robustness of the results to
+changes in the data preparation and analytic choices.

@@ -1,0 +1,140 @@
+---
+output:
+  pdf_document:
+    fig_caption: yes
+    number_sections: yes
+urlcolor: black
+linkcolor: black
+bibliography: 99-refs.bibtex
+fontsize: 12pt
+geometry: margin = 1in
+header-includes:
+- \usepackage{placeins}
+- \usepackage{fancyhdr}
+- \usepackage{geometry}
+- \usepackage{setspace}
+- \usepackage{chngcntr}
+- \usepackage{microtype}
+- \counterwithin{figure}{section}
+- \counterwithin{table}{section}
+- \geometry{a4paper,top=3cm,bottom=3.5cm,left=2.5cm,right=2.5cm,bindingoffset=5mm}
+- \onehalfspacing
+---
+
+---
+nocite: | 
+  @Example1999, @Example2000
+...
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.path = 'figures/',
+                      echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+\pagenumbering{gobble}
+
+```{r child = 'titlepage.Rmd'}
+```
+
+<!-- \newpage -->
+
+<!-- ```{r child = 'declaration.Rmd'} -->
+<!-- ``` -->
+
+\newpage
+\pagestyle{fancy}
+
+\fancyhead[LE,RO]{}
+\fancyhead[LO,RE]{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\pagenumbering{roman}
+
+\fancyhead[CO,CE]{Abstract}
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+
+```{r child = 'abstract.Rmd'}
+```
+
+\newpage
+\fancyhead[CO,CE]{Acknowledgements}
+\section*{Acknowledgements}
+\addcontentsline{toc}{section}{Acknowledgements}
+
+```{r child = 'acknowledgements.Rmd'}
+```
+
+\newpage
+\fancyhead[CO,CE]{Table of Contents}
+\setcounter{tocdepth}{2}
+\tableofcontents
+
+\newpage
+\pagenumbering{arabic}
+
+\newpage
+\fancyhead[CO,CE]{Introduction}
+
+```{r child = '1-introduction.Rmd'}
+```
+
+\FloatBarrier
+\newpage
+\fancyhead[CO,CE]{Graphs}
+
+```{r child = '2-graphs.Rmd'}
+```
+
+\FloatBarrier
+\newpage
+\fancyhead[CO,CE]{Networks}
+
+```{r child = '3-networks.Rmd'}
+```
+
+\FloatBarrier
+\newpage
+\fancyhead[CO,CE]{Changepoint Detection}
+
+```{r child = '4-cpd.Rmd'}
+```
+
+\FloatBarrier
+\newpage
+\fancyhead[CO,CE]{Analysis}
+```{r child = '5-analysis.Rmd'}
+```
+
+\FloatBarrier
+\newpage
+\fancyhead[CO,CE]{Conclusions}
+```{r child = '6-conclusions.Rmd'}
+```
+
+\newpage
+\fancyhead[CO,CE]{List of Figures}
+\addcontentsline{toc}{section}{List of Figures}
+\listoffigures
+
+\newpage
+\fancyhead[CO,CE]{List of Tables}
+\addcontentsline{toc}{section}{List of Tables}
+\listoftables
+
+\newpage
+
+```{r appendix_options, include=FALSE}
+knitr::opts_chunk$set(fig.path = 'figures/',
+                      echo = T, warning = FALSE, message = FALSE)
+```
+
+```{r child = 'appendix.Rmd'}
+```
+
+\FloatBarrier
+\newpage
+\fancyhead[CO,CE]{References}
+
+# References

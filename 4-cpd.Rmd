@@ -1,0 +1,437 @@
+---
+bibliography: 99-refs.bibtex
+output:  pdf_document
+---
+
+# Changepoint detection
+
+Physical and social reality is one of constant, unending change and
+evolution. Depending on the nature of the phenomenon, this tendency to vary
+in time could be caused by cyclical patterns, by internal or external shocks,
+or by gradual but persistent change.
+
+That of changepoint detection (also called disorder problem, or probabilistic
+diagnostics) has been an active field of research concerned
+with exactly this problem: from the statistical point of view, a change point
+is either a moment in time or a place in space such that the observations
+follow one distribution up to that point an another after that point. From this
+definition, it is apparent that the problem can be split into two different
+subproblems:
+
+1) Given a certain point, we might be interested in knowing whether it
+is actually a changepoint (generally seen as an hypothesis testing problem);
+
+2) We know that there has been an abrupt change in the data generation process,
+and we wish to identify the exact moment in which it occurred.
+
+Change detection was initially developed in the field of
+statistical quality control, to monitor and improve the quality of industrial
+processes.  Since its birth in the 1950s with the works of Page, Rubin and
+Girshick [@brodsky2013nonparametric, p. 22], who proposed heuristic algorithms
+to deal with the problem when related to industrial quality control, and its
+first mathematical formulation due to Shirayev (*ibidem*), the scope
+of techniques have been expanding, tackling ever more complex problems.
+
+Nowadays change detection can be applied to textual analysis to identify
+changes of authorship in literary works, to medical imaging to detect anomalous
+growth in organs, to high-dimensional aggregated data in various fields,
+and of course to various biological, technological and social networks; for
+example modeling the spread of a disease in a social community, assessing
+malicious attacks in computer networks, or detecting changes in leadership
+in a terrorist network [@krebs2002mapping].
+
+In this chapter, we'll introduce the basic terminology and model underlying
+changepoint detection. We'll follow an updated review of the techniques
+proposed for detecting changes in the structure of network data, focusing
+on a promising method first proposed by @chen2015graph that was missing
+from other reviews.
+
+## The basic model
+
+Express analitically what is meant by changepoint, let's assume to observe a sequence of
+$n$ independent random vectors $\mathbf{x_{1}, x_{2}, \ldots, x_{n}}$.  The subscript
+$i$, $i \in \{1, \ldots, n\}$ can be regarded as the temporal order of the
+observation or any other suitable ordering imposed on the data.  Let 
+$F_1, F_2, \ldots, F_n$ be the corresponding probability distributions.
+
+In general the changepoint problem can be regarded as an hypothesis testing
+problem: we wish to test the hypothesis that there is no changepoint, i.e.
+that all the observations have the same probability distribution, versus
+the alternative that some are different. 
+
+The homogeneity assumption is formulated in the following way in the
+case of a single change point alternative:
+
+\begin{equation}
+H_0 : y_i \sim F_0 ~ \text{for}~~i \in (1, \ldots, n )
+\end{equation}
+versus:
+\begin{equation}
+H_1 : y_i \sim F_1 ~ \text{for}~i~\in (n+1, \ldots, N )
+\end{equation}
+
+where $F_0$ and $F_1$ are two probability distributions which differ on a set of nonzero
+measures. The main assumption, in this framework, is that the the $y_i$ are
+independent for all $i, j$ with $i \ne j$.
+
+In the case where the
+probability distributions $F_1, \ldots, F_n$ belong to the same parametric
+family $F(\mathbf{\theta})$, where $\mathbf{\theta}$ is a $k$-dimensional parametric
+vector, $\mathbf{\theta} \in \mathbf{\Theta}$ 
+the changepoint problem can be reduced to the testing
+the equivalent null hypothesis concerning the equality of all the (unknown)
+population parameter vectors:
+
+\begin{equation}
+H_0 = \theta_1 = \theta_2 = \ldots = \theta_n =
+\theta
+\end{equation}
+
+versus the alternative
+
+\begin{equation}
+H_1 : \theta_1 = \theta_2 = \ldots = \theta_{k_1} \ne \theta_{k_1 +
+1} = \ldots = \theta_{k_2} \ne \theta_{k_2 + 1} = ... \theta_{k_q} \ne
+\theta_{k_q + 1} = \theta_n
+\end{equation} 
+
+Notice that sometimes in the literature a sequence of observations with no
+changepoints is referred to as *stochastically homogeneous*.
+The origin of this terminology becomes clear if the
+sequence is regarded as a trajectory from a homogeneous stochastic process.
+A simple example of how a gaussian process with an abrupt changepoint can look
+like is presented in \autoref{process}
+
+
+```{r process, echo =F, message=F, fig.scap="An example of a process presenting an abrupt change", fig.cap="\\label{process}An example of a normal process presenting an abrupt change at T=25, emphasized by the dashed vertical line.", out.width=".6\\linewidth", fig.align='center'}
+
+set.seed(123)
+p1 <- rnorm(25, 5, 1.2)
+p2 <- rnorm(28, 12, 1.2)
+
+plot(c(p1, p2), type='p', xlab="time", col='cornflowerblue', ylab="")
+abline(v = 25.5, col="light grey", lwd=2, lty=2)
+```
+
+
+The intrinsic difficulty in extracting information on a probability
+distribution from the smallest possible set of observations, and to act upon
+an eventual change in distribution in a timely way, is even more obvious if
+we consider the case of distributions that cannot be summarized by a single
+statistic or parameter. If we're analizing a process each realization of
+which we know to come from a normal distribution of known variance (assume,
+for example, that the variance is known since the process has been observed
+at length in the past) then the problem is reduced in identifying changes
+in the mean.
+
+A much more complicated problem can be that of determining whether a
+complex system, such as a network, underwent significant modifications in
+its structure. This requires constant observation of the system and suitable
+methods to identify the changepoints.
+
+## Social network monitoring
+
+In recent years, the interest in methods able to detect changes and anomalous
+observations in sequences of network snapshots has been steadily rising. The
+literature is very diverse and cross-disciplinary, research in this field
+is extremely active, and a thorough examination would exceed the aims of
+this work. There have been, however, a number of surveys on the topic that
+focus on slightly different aspects of the problem. @akoglu2015graph, while not
+considering exactly the problem of changepoint detection in longitudinal graph
+data, offers a comprehensive survey of techniques for anomaly detection and
+proposes a general framework for the classification of those algorithms. A
+more recent, if shorter, survey is that of @miller2013efficient. It is also
+worth mentioning @yu2016survey contribution, since it focuses specifically
+on the problem of anomaly detection in social networks and emphasizes
+effectively the difficulties it entails.
+
+While that anomaly detection is
+a different problem from changepoint detection, it easy to see how methods
+dealing with this issues may be related: the former focuses is on detecting
+an anomalous observation or cluster of observation, the latter on monitoring
+a process watching for the emergence of such anomalous data points, aiming
+at a timely and precise identification of these outliers.
+
+The objective of social network monitoring is "to detect sudden changes in
+the behavior of a subset of individuals in the network" [@woodhallreview].
+The first difficulty that needs to be solved is then
+defining a suitable metric to embody the specific behavior one would like
+to monitor. Once such a measure is defined, one has to determine what range
+of values is to be considered normal and what could instead be indicative
+of an anomaly.
+
+Since social network monitoring does not generally take place under controlled
+conditions, the definition of normal behavior is a problematic issue with no
+obvious solution. The definition of an anomaly varies with the interests of the
+researcher, with the general caveat that global changes are easier to detect
+relative to changes in some subnetworks, and since networks are expected to
+evolve over time only changes of a certain magnitude are generally of interest.
+
+Among the many issues a general method for detecting changes in network data
+must overcome Seasonality needs to be accounted for; aggregation of several
+observations over a specified time window is a delicate step that causes
+information loss.
+
+As suggested in a recent review of @woodhallreview the main interest
+in the social network analysis is on the detection of sudden changes in
+the behavior of the network’s members or of some of their sub-groups.
+The main way  to consider the data  which arise in a network structure is by
+accounting for their graphical structure.  Therefore, graph theory relying
+on models for categorical data [@pennoni2000metodi] is often employed
+to detect those changes.  The statistical assumptions are mainly based on
+modelin the counts as arising from a  Binomial or a Poisson distribution,
+by considering appropriate matrices of counts.
+
+Some useful statistical procedures are employed in the network analysis
+to show the changes with respect to a mean performance of the  net such
+as those developed on the industrial statistical literature of the quality
+control field.  In this field there are two distinctive phases of analysis: the
+first one deals with a baseline set of data which are employed to understand
+the production process behavior. The second one which can be started once
+the process is considered under control, the values gained in the previous
+phase are used to design methods for the  prospective phase of monitoring the
+on-going process.  The charts used to monitor the production of defective
+pieces  are called  cumulative sum (CUMSUM) and the exponentially weighted
+moving average (EWMA) chart are considered by @hawkins2014cusum.  In the
+analysis of network data they are employed in the second phase and as showed
+recently by @saleh2016cusum they are more  effective after a network graph
+is estimated on the data. In the network analysis the first phase mainly
+employes the change-point analysis and the outlier detection.
+
+When the structure of the network is complex  a model which is able to
+show the between and within relations of the sub-networks is needed and
+some recent proposals are based on a logistic regression model such as that
+of Azarnoush et al. 2016 to allow  also  for the changes which  may occur
+over time.  Another proposal is that of Miller at al (2016) which instead
+use a log-linear model for modelin the pairs of connection probabilities.
+
+Among the approaches dealing with the signal detection theory the Bayesian
+approach developed by Heard at al. 2010 does not make the distinction
+between the two phases and uses the Bayesian predictive distributions
+to fix the control limits of the chart to identify the anomalous pairs
+of individuals. However, in this proposal the blocks of time are fixed.
+Within the scan methods approaches the sign to indicate that the process in
+not in control (e.g. an anomalous increase in the communication levels)  is
+calculated according to standardized network metrics over each time periods
+by considering five times the standard deviation from the estimated mean.
+
+Within the time series models the most relevant is that of Pincombe (2005). A
+more recent proposal will be taken into account in this thesis work which
+is that of @chen2015graph, later expanded by @chen2016sequential to address
+the case of sequential analysis leveraging on the $k$-nearest neighbours
+clustering algorhitm.
+
+Another quite comprehensive survey of the  recent existing methods up to
+the 2014  employed to detect the anomalies in the network is provided by
+@savage2014anomaly. They explain that the field of the social network analysis
+is quite new and their is a first attempt to survey the methods devoted
+to find the anomalies of the network.
+
+The main published papers are related to
+the computer science literature as they originates on the computer networks
+field. However, as pointed out by many authors in the social science field
+it is not appropriate to apply directly the same methods as the objective
+are typically different. According to @savage2014anomaly whose review is
+only related to the online networks the classification intended as supervise
+learning, clustering, nearest neighbour, information theoretic and spectral
+analysis are the most employed statistical methods in this field.
+
+First, there is the problem to define when the network works normally and then
+it will be possible to define anomalies.  When the same net is considered
+the pattern of interaction which differ from the norm can be detected in
+accordance with the type of anomalies which can be: static or dynamic,
+labeled or unlabeled, local or global and the minimal anomalous unit
+(cf. @savage2014anomaly, sec. 6).
+
+The static labeled anomalies model the
+probability that a given pairs of individuals will interact. In this context,
+the signal processing techniques are useful to treat anomalous subgraphs
+as signal embedded in a larger graph. In the static labeled anomalies the
+counts of the edge labels helps to identify those with an excessive high
+frequency. This method was useful to identify opinion spam in online products
+reviews (see, @pandit2007netprobe) by means of hidden labels assigned to
+vertices and edges of the graph. The entropy is a measure derived from the
+information theory and it is used to describe the number of bits associated
+with information and it provides  a measure of heterogeneity. The change
+in entropy level when a subgraph is removed is a useful to identify the
+communities which may be influential. 
+
+The dynamic anomalies (unlabeled)
+are those detected when the structure of the network in one time period is
+different from the same structure in another time period. The scan statistics
+(McCulloh and Dickinson, 2013, @silva2008detection) are employed as well
+as the auto-regressive moving average models  (Picombe, 2005).  The dynamic
+anomalies (labeled) assumes that the probability of an edge occurring  between
+two nodes is a function of the linear combination of the node structure
+[@miller2013efficient]. The methods which rely on discrete sequences seems
+to be the most fruitful as suggested by @chandola2012anomaly.
+
+This classification does not rely on any specific domain knowledge. It is easy
+to realize, however, that the definition what can be considered to be anomalous
+behavior will depend greatly on what the investigator knows or wants to
+emphasize of the original network. In some cases the anomalous behavior will
+stem from the activity of individuals, in others there might be a group of
+people whose coordinated activity substantiates in the phenomenon of interest.
+
+Thus identify the relevant features of a network is a blatantly non-trivial
+task, and measuring these features must often rely on specific domain knowledge
+and an intimate familiarity with the context of the analysis. To add to this
+complexity, it must be also noted that when an anomaly is identified it might not
+be easily falsifiable, in most settings. 
+
+In other words, real world example are often complicated by the fact that even
+when the statistical technique succeeds in pinpointing anomalous activity, it
+is often difficult to show *a posteriori* that such activity was, in fact,
+anomalous.
+
+## Graph-Based change point detection
+
+As explained above the change point detection analysis is devoted to find the point
+where in a sequence of data we can clearly distinguish two different shapes
+of distributions. The problem when large amount of data are available
+is that of testing the homogeneity assumption also when the dimension of
+each observation is larger than the dimension of the sequence.
+
+The network evolution analysis is devoted to find the point in time in which there
+is an abrupt shift in network connectivity. This field of research is
+also relevant for the image analysis as at each time point there is a
+digital encoding of an image.
+
+@chen2015graph proposes a method to identify changepoints that is non parametric
+and can be applied to non-Euclidean data.
+
+### Setting up the test
+
+They propose to divide the data or, in the case of social network monitoring, the sequence
+of graphs $G_1, \ldots, G_n$, $G_i = (V_i, E_i)$ with $i \in (1, n)$ into two groups,
+splitting them according to their position relative
+to a time-index $\tau$. $\tau$ must be chosen so that each subgroup contains a 
+minimum number of observations
+
+\begin{equation}
+1 \le n_0 \le \tau \le n_1 \le n
+\end{equation}
+
+where $n_0$ and $n_1$ must be specified by specific domain knowledge.
+
+No assumptions are imposed on the sample space of the ${G_i}$ ,
+the only requirement being that their dissimilarity can be measured by some
+metric. This is to insure that the whole sample space can be
+represented as a graph, with edges connecting observations that are *close* in some
+sense. Let $S({G_i}, {G_j})$ be a similarity metric
+to be applied to a pair of graphs. It is further required that $S$ is a proper
+distance metric, so to satisfy the properties of simmetry and triangle inequality.
+
+The method then requires us to construct another graph, which we will call the *test graph*, $G^c=(V^c, E^c)$.
+In this graph, each vertex corresponds to one observation, and
+$S({G_i}, G_j) = S_{ij}$ serves as a basis to weight the edges connecting $v^c_i$ and
+$v^c_j$, where  $v^c_i$ and
+$v^c_j \in V^c$ are the vertices of the test graph corresponding to ${G_i}$ and ${G_j}$.
+
+
+The minimum spanning tree for a set
+of vertices $V$ is the choice of edges $E_{MST}$ among all possible trees 
+that minimizes total weight.
+Other choices are possible, for instance using a *NNG*
+(Nearest Neighbour Graph) instead of a minimum spanning Tree.
+According to the chosen metrics, the groups will be well separated if their
+latent distribution is different.
+
+#### Proposed scan statistic and distribution
+
+In the following, we illustrate the use of the proposed test statistic.
+Considering that there can be many possible values for $\tau$, and that
+some observation come before and after tau. Dividing the time in this way
+implies that the events so called of the past ($i \le \tau$), and of the future
+($i > tau$) have to be counted.
+
+A useful measure is denoted by $R_G(t)$ which counts
+the number of the edges in the graph connecting the observation before
+and after $\tau$. $R_G(t)$ is defined as follows. Let $G$ indicate
+the graph or, equivalently, the set of the graph's edges when no ambiguity can arise.
+Allow $t$ to vary from $1$ to $n$ and let this $t$ represent the set of possible values
+of $\tau$. Finally, let $g_i(t)$ represent the indicator function that takes value $1$ when
+the $i$-th observation occurs before $t$ and 0 otherwise.
+
+Then, the number of edges connecting observation that come *before* $t$
+to observations that come *after* $t$ is:
+
+\begin{equation}
+R_G(t) = \sum_{(i, j)\in G} I_{g_i(t) \ne g_j(t)}
+\end{equation}
+
+$R_G(t)$ is useful as a basis to derive a scan statistics because, intuitively, if the two
+subsets of observation split by means of the time index $\tau$ are well separated
+and the distance metrics chosen is informative with respect to that separation,
+then the number of edges connecting observations *across* this time barrier will
+be small. In other words, small values of $R_G(t)$ provide support to the alternative hypothesis.
+
+Under $H_0$ and assuming that the observations of the sequence
+are independent a comparison is done  between the joint distribution and
+the distribution which is derived  under permutation of the edges of the
+graph. Therefore, the null distribution of $R_G(t)$ is the distribution in
+which the $1/n!$ probability is given on each of the $n!$ permutations of $y_i$.
+Here we show the scan statistic for a single change-point alternative, first obtaining
+the standardized version of $R_G(t)$:
+
+\begin{equation}
+Z_G(t) = - \frac {R_G(t) - \mathbf{E}[R_G(t)]}{\sqrt{\mathbf{Var}[R_G(t)]}}
+\end{equation}
+
+The derivation of the first and second moments of $R_G(t)$ is performed by the
+authors by mean of a combinatorial strategy we will not cover. Notice
+however that changing the sign now implies that *large* values of Z_G(t) provide
+evidence to the alternative hypothesis.
+
+Once the standardized measure of connectedness is defined as above, the *scan statistic*
+used to perform the test is then
+
+\begin{equation}
+\max\limits_{n_0 \le t \le n_1} Z_G(t)
+\end{equation}
+
+where the null hypothesis is accepted when this maximum is lower than the threshold.
+
+To establish the possible range for the values of the scan statistic $Z_G(t)$ we look
+at the tails of the its distribution under $H_0$ in the following:
+
+\begin{equation}
+P(\max\limits_{n_0 \le t \le n_1}Z_G(t)>b)
+\end{equation}
+
+The analytic expression for the tail probabilities
+is derived by the authors for large $n$ when it is not possible to use the
+permutation distribution due to computational difficulties. They show its
+convergence to a Gaussian process.
+
+The problem of a graph with large hubs determines that test statistics is left-skewed and the p-value
+approximation overestimates the tail probabilities. The authors consequently
+propose to use a cumulant generating function to correct for skewness in tail
+probability approximation of the change point test which accounts for
+the skewness at each time point.
+
+In the context of this work it must be highlighted how Chen's method is viable
+for social network analysis precisely because it is applicable to any form
+of data, including but not limiting to graphs, as long as a suitable distance 
+metric can be defined. Moreover, the test statistic and
+its properties under the permutation null rely only on the graph and not on the
+underlying distance measure nor on the original data.
+
+The method therefore allows for the aformentioned needed flexibility in the 
+definition of the distance metric to be used that can be determined by domain
+knowledge and, most importantly, can be applied despite any informational
+limitation of the data that may be found during analysis. It is also possible to
+analyze the time-related variation of the graph at various resolution depending
+on available data.
+
+The most appealing feature of this approach is the possibility of
+quantifying the probability of the observed configuration, obtained in an intuitively
+convincing way thanks to the comparison with the null under permutation.
+
+A potential drawback however is that the very flexibility that makes
+this graph-based test so appealing also obscures the inner workings
+of the method, making it quite difficult to grasp and leaving a lot of 
+decisions to the analyst. In our illustrative example, using data from
+the RealityMining project collected by the Massachussets Institute of 
+Technology, we implemented a **shiny** webapp to allow the end user 
+to manpulate the parameters of the analysis.

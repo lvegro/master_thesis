@@ -1,0 +1,388 @@
+---
+output: pdf_document
+---
+
+# Network analysis
+
+By network data, we mean a collection of observation of a phenomenon
+that can be represented as composed of entities connected to one
+another by relationships. While the statistical theory at the root of
+network data analysis originated in the fields of sociology, psicology
+and organizational studies where the entity/relationship paradigm
+is intuitive, there have been succesfull applications of network
+data analysis in disparate fields, ranging from molecular biology
+to climate science [@agrawal2002extreme; @tsonis2006networks; @ma2011introduction].
+
+That graphs can provide a useful modeling framework to treat network data
+is proven by the fact that graphs constructed from social, biological,
+technological networks have been found to be structurally similar in a
+surprising way, and are characterized by nontrivial properties. Research
+on this kind of networks was initially stimulated by the work of Duncan
+Watts and Steven Strogatz, who first noticed the real-world applicability
+of a certain class of random graphs [@watts1998collective].
+Most recently, the processes that give rise to such networks have
+collectively been termed *complex systems* [@wang2003complex].
+
+### Small world networks
+
+There are a few properties of these "Small World Networks" that have
+been repeatedly verified across fields [@telesford2011ubiquity]:
+
+\begin{itemize}
+\item Small World Topology: simply speaking, the term
+  describes factthat even for networks with a very large number of there is usally
+  a short path connecting any pair of nodes. Initially noticed by
+  [@milgram1967small] it gave popularity to the concept of "six grades
+  of separation", implying that any two people in the United states
+  can be shown to be connected by a path of acquietances comprising on
+  average six other people. This is not exclusive to real world networks,
+  however, since Erdos and Renyi showed that the average path length
+  in random graphs scales as the logarithm of the number of nodes, thus
+  random graphs exhibit the same small world property as empirical graphs.
+\item Scale-free degree distribution: since in a random graphs the
+  nodes are connected at random, on average each node will have
+  approximately the same degree. In real world networks however
+  connections are established according to certain criteria and the
+  degree distribution of those graph will be significantly different
+  from that of the random graph counterpart. A surprising result from
+  recent empirical research is that many networks. from the Internet to
+  metabolic networks, the degree distribution appears to have a power
+  law: $ P(d) = d-k$ where with $P(d)$ we indicate the probability that a
+  node in the network has degree at least $d$ and $k$ is a positive real
+  number. This structural characteristic is called scale free since,
+  as it can be seen by the equation above, the probability of a node
+  having a specific degree does not depend on the overall number of nodes.
+\item Clustering: describes the tendency of most social graphs to
+  organize in cliques, representing circles of friends or acquientances
+  where relationships are transitive and symmetrical (every member knows
+  every other member). Here empirical networks exhibit a different
+  behaviour from random graphs, and generally present a clustering
+  coefficient much higher than the random graph counterpart.
+\end{itemize}
+
+## Temporal networks
+
+So far we have considered only static graphs. As mentioned earlier,
+recent technological advances in data collection have enabled researchers
+to acquire data on large networks that are followed during an extended
+period of time. While these networks are often represented aggregating
+all observation into a single graph, this approach is not without
+weaknesses. It has been shown by @tang2009temporal that this
+approach leads to an overestimation of the total connections between
+vertices and consequently to an underestimation of the average length
+of paths.
+
+Such evolving networks present intransitivity and reachability issues
+since ties between vertices strengthen and fade continuously, are
+instantly created and then vanish. In other words they are not always
+active at all times, and not with the same intensity: in static graphs,
+nodes are either connected or not. In temporal networks the concepts
+are more nuanced.
+
+One is not generally interested in studying the network itself: rather,
+the interest lies in the dynamical sistems that act on the network,
+and the purpose is to infer characteristics of the system by observing
+the changes that it causes on the graph that encode the network. In
+traditional modeling one separates the underlying static network from
+the dynamic system, but there are advantages in modeling the two elements
+together.
+
+Graphs still provide a useful framework for the modeling of time-varying
+networks since they allow us to "study the dynamics of the system without
+focusing on the dynamics at all" [@holme2012temporal].
+
+### Representation of temporal networks
+
+As we just mentioned, if one has reliable data on the temporal persistence
+of connections between nodes of the network of interest, it would be a
+gross oversemplification to flatten it on a single static graph. That
+would result in a loss of information since since not all contacts can
+be considered to have the same importance.
+
+A possible partial
+solution is to use some of the temporal information to construct edge
+weights to give greater relevance to some connections; for example in a
+phone calls network one might choose to emphasize some edges according to
+the duration, the frequency or the number of calls between users.  Still,
+this misses the point of true time varying graphs since it considers all
+paths to be steadily available, overestimating the connectivity of the
+graph and conversely underestimating the distance between subjects.
+
+A \emph{longitudinal} or \emph{temporal graph} can be thought of as an
+ordered sequence of graphs, were connections vary among a fixed set of
+nodes.  A temporal or longitudinal network is then considered as a sequence
+$G_1, \ldots, G_i, \ldots, G_n$ of graphs, each observed at time $t_1, \ldots, t_i, \ldots, t_n$ with time resolution
+$t_{i+1} - t_i = \Delta t$.
+
+For example, the same set of people (vertices) can be monitored
+every day for $N$ days. If we consider two subjects connected if they had contat with each
+other on any given day, then we will have observed $N$ sets of edges
+$E_1, \ldots, E_N$ upon the same static set of vertices $V$. In other
+situations of course the set of vertices can vary too, if for example
+subjects drop in and out of the sample during the observation period.
+
+Formally, the temporal graph collected from $t_{min}$ to $t_{max}$
+$G^w(t_{min}, t_{max}$ is defined, following @tang2010analysing, as
+the sequence $G_{t_{min}}, G_{t_{min}+1}, \ldots, G_{t_{max}}$ where $w$
+is the size of the time window, corresponding to the temporal resolution
+of the graph (and could be measured in days, hours, minutes or seconds),
+so that there are in total $W = (t_{max} - t_{min})/w$ graphs in the
+sequence.
+
+We define a contact function $R^s_{ij}$ to be equal to 1 if there is a
+connection between vertices $v_i$ and $v_j$ at time $s$; eqivalently,
+$R^s_{ij} = |a^s_{ij}|$ where with $a^s_{ij}$ we indicate the element
+of position $i,j$ in the adjacency matrix associated with the $s$-th
+graph in the sequence.
+
+In this model, a \emph{temporal geodesic} between two vertices $i$
+and $j$ is defined as a sequence of $k$ steps going from $v_i$ to $v_j$
+at time $t_k$: $p_{ij} = \{v^k_i, \ldots, v^k_j \}$; for certain times,
+there could be no path going from $v_i$ to $v_j$ and we'll call them
+\emph{temporally disconnected} pairs.
+
+### Centrality in temporal networks
+
+"The topological structure of a static network can be characterized
+by an abundance of measures" @[holme2012temporal]. Measures that, as we have
+seen in section \ref{sec:centrality} are in essence based on node
+connectivity (ex. degree centrality or distribution) or on node distance (ex. betweenness and
+closeness centrality, diameter).
+
+The same applies to temporal networks. In recent times there have been
+various attempts at modifying existing centrality measures to adapt them
+to the temporal framework. No widely accepted solution exists as of yet.
+
+@tang2009temporal and  @tang2010analysing have proposed extensions of
+the two main centrality measures based on temporal node distance taking
+into consideration the speed at which information travels through the
+network, which they modeled using a \emph{horizon parameter} $h$.
+@uddin2013conceptual proposed a way to measure the dinamicity of
+the network comparing various centrality scores for all the vertices
+from the static graphs to those of the aggregated graph. This also allows
+him to identify the most dynamic users.
+
+There have been attempts, see for
+example @mcculloh2011detecting, to leverage on these extensions of centrality
+to model and characterize the evolution of the process underlying the
+generation of a temporal network.
+
+For the approach taken in this work, however, and for the purpose of identifying
+change in the latent structure of the network as it evolves through time in
+accord with the scope of changepoint detection, the quest to find a centrality
+measure able to embody all the complex characteristic of a labelled graph
+seems daunting and, given the current performance of clustering and
+change-detecting algorithms, ultimately decisive for the results of the analysis.
+
+## Visualizing dynamic networks
+
+It is said that a picture is worth a thousand words, and this is also true in Statistics.
+The way data is presented through graphs, depending on the way the
+visualization is done, can enhance as well as hinder understanding. 
+"The ability to see data clearly creates a 
+capacity for building intuition that is unsurpassed by summary 
+statistics" [@moody2005visualizing].
+
+In fact, the human ability of perceiving patterns in pictures and visual stimuli
+cannot yet be even approximated by a computerized system, as anybody who ever
+had to fill out an internet *captcha* (a simplified, automated Turing test
+design to discriminate legitimate users from spambots and crawlers) can testify.
+
+A trivial task like that of identifying the pictures that contain a given object
+cannot currently be performed reliably by software. While in some highly specialized
+context such as letter recognition there have been huge progresses, it is often
+enough to add a slight distortion or change in the colors of the input
+to significantly worsen the performance of the software, while humans can 
+without effort adapt to the change and reliably distinguish the text.
+
+This mundane skill can also serve as a benchmark to assess the performance of statistical
+methods. Take for example a task in which humans are well versed, like that
+of distinguishing sets of objects gathered closely to ones less dense.
+The identification of groups of similar observations is the aim of cluster analysis;
+when however observation are plotted as points in their feature space some
+algorythms could perform badly depending on the specific shape the clusters
+take.
+
+In \autoref{iris} we show a scatterplot derived from the famous *Iris* data set. It comprises
+measurements of the flowers of three different species of irises and is routinely
+used to introduce cluster analysis to students. The three species form
+clearly separated clusters depending on the characteristics shown on the axes, 
+and these groups are obvious to a quick visual inspection,
+particularly when the information about the species is also mapped
+into the data display.
+
+```{r iris_plot, echo =FALSE,fig.cap="\\label{iris}Scatterplot matrix visualization of Edgar Anderson's `Iris' data"}
+data(iris)
+pairs(iris[1:4],
+      main = "", pch = 21,
+      bg = c("indianred","palegreen","cornflowerblue")[unclass(iris$Species)])
+```
+
+In order to get a computer to perform the same task, a distance function has to
+be defined to compare observations; then a rule must be thought out to assign
+each observation to a group to ensure maximal external separation and internal
+cohesion (each group must be composed of observations *similar* to each other
+and *different* from the ones in other groups); if the analyst opts
+to use a hierarchical clustering algorithm then an additional decision about
+the final number of clusters to retain must be taken.
+
+If we compare this sequence of operation to the intuition we get simply from
+looking at the display, the differences are obvious. When observing a graph, 
+a human being can recognize a cluster if the graph is plotted the right way,
+while no insight can be obtained if the plot is suboptimal. See \autoref{karate}
+for an example.
+
+```{r echo =F, message=F, fig.scap="Visual clustering of a network", fig.cap="\\label{karate}The *Karate* dataset in two alternative representation. Notice how the two clusters are clearly identifiable in the second display and not in the first", fig.align='center'}
+library(igraphdata)
+library(igraph)
+data(karate)
+par(mfrow=c(1,2))
+plot(karate, layout=layout_in_circle, vertex.color='light grey')
+plot(karate)
+```
+
+
+No assumptions need to be made, no weaknessess of the distance function chosen must be taken
+into consideration. Ambiguity can arise, but a much subtler level than when
+applying the wrong algorithm for the set of data.
+
+The main difficulty, in fact, that viewer experience when exposed to visualization
+of multi-dimensional data is the intrisic loss of information that occurs
+by "flattening" the data into a two-dimensional surface - screen or paper.
+This can somehow be mitigated by leveraging on the relatively new graphical
+capabilities of computer system, that now allow the production of interactive
+interfaces where the user can autonomously choose which dimensions to explore,
+which subsets of data to analyze by *drilling down* on them, and so on.
+
+The above remarks are also true for graph and network visualization, where
+vertex and edges characteristic provide additional dimension of analysis which
+are very difficult to efficiently display in a static way. Even simple
+unlabelled graphs can give rise to uneffective visualization due to the
+*ball of yarn* phenomenon, where an high number of links can render a link-node
+diagram unreadable. The graph to the left of \autoref{karate} is a suitable
+example.
+
+Specifically related to dynamic social network visualizations, several 
+approaches have been proposed in the literature. @vehlow2015visualizing and
+@bach2015multipiles, for example, focused on the identification and evolution
+of community structures. @reda2011visualizing were able to show that by providing
+an interactive interface to explore data from a longitudinal social
+network is helpful in supporting intuition and gaining a clearer understanding
+of the relevant social phenomena.
+
+A comprehensive survey and summary of existing research can be found in @beck2014state
+focusing on suggested approaches from a theoretic point of view. Various
+solutions have also been proposed for specific software designed to carry out
+the visualization and to interact with data in a convenient way.
+
+Gephi [@bastian2009gephi] is a general purpose, open source software tool for
+exploratory analysis and visualization of network data that embeds
+functionalities toproduce animations and "*movies*" showing the evolution of
+the network graph through time. See \autoref{gephiscreen} for an example of how
+Gephi's main window looks. Other solutions have of course been proposed
+dealing with specialized contexts or novel approaches to the visualization
+problem, using both specific software solutions and extensions to widely used
+statistical analysis tools such as **R** [@rcore]. For R, see for example the packages 
+**visnetwork** [@visnetwork] and **ndtv** [@ndtv]. The main package used for visualization
+and analysis of graphs in this work is **igraph** [@igraph], that includes functions
+to display, analize and simulate graph data.
+
+![A screenshot of Gephi's main window, from www.gephi.org \label{gephiscreen}](images/gephi.png)
+
+A widely used R package for the analysis of network data, which does not however
+include specifically functions to represent dynamic networks, is @igraph. In
+this work we decided to approach the problem starting from the basics, 
+
+
+## An R-Based approach with **Shiny**
+
+Coming back to the cartographic metaphor, to thouroughly understand an uncharted
+territory we will need to look at several thematic maps each highlighting a
+different phenomenon.
+
+As we mentioned aboce, the main difficulties
+in analyzing network-structured data are related to the high dimensionality
+implicit in each graph -- as even a simple directed graph with $N$ nodes is a
+representation of a $N \times N$ matrix -- and in the fact that the
+interpretation of the results depends intimately on choices made in measuring
+and interpreting connections between nodes (the nodes themselves are relatively
+easy to identify and quantify).
+
+The richness and depth of the data is potentially so vast that an exaustive
+analysis would be very difficult to report. There are however tools available
+that let us build, with very little technical expertise, a web-based interface 
+allowing any user to explore and observe the data in an interactive fashion.
+
+**Shiny** by RStudio [@shiny] is a programming tool designed to embed code
+written in the R language into a web app, i.e. an HTML document
+with graphical elements to that can then be used to
+execute and modify certain parameters predefined within the code, enabling even
+those who don't know any R to interactively perform complex analysis and explore
+any dataset. Shiny is cross architecture, open source and distributed as an R
+package.
+
+The Shiny web framework is able to take values from a dynamically generated web
+page and pass them seamelessly to R. R code is then executed and results are
+redirected to the same, updated, web page.
+Since Shiny web apps are interactive, the input values can change at any time,
+and the output values need to be updated immediately to reflect those changes.
+
+Shiny comes with a reactive programming library that one will use to structure 
+the application logic. By using this library, changing input values will 
+naturally cause the right parts of the R code to be reexecuted, which will in 
+turn cause any changed outputs to be updated.
+
+From the R programmer point of view, all it's needed to write are two different
+programs: `ui.R` takes care of drawing the user interface and creating the
+objects that will be passed to the R functions contained in `server.R`, where
+the R code that is actually executed resides; see \autoref{shiny}.
+
+![The main components of the `shiny` workflow \label{shiny}](images/shiny.png)
+
+
+Another advantage offered by Shiny is its client-server architecture, so the
+execution of the R code (and therefore the computational effort of the analyis)
+happens on a different machine -- possibly an array of machines or even a
+high-performance computer -- and the communication between the client and the
+server is routed either through the Internet or a local network. 
+This mechanism allows for the analysis of data requiring more memory or
+computational power than that of the client machine, and serves as an aid to
+an effective allocation of resources.
+
+Lastly, since the interface to the R part of a shiny app is built with 
+computer-generated HTML, it is also possible to extend the UI with Javascript 
+libraries such as d3.js leveraging their capabilities for interactive
+visualization and animation. In other words, it's possible to feed R output
+into Javascript code and produce cross-platform,publication level
+visualizations.
+
+Add example of Code + corresponding shiny view
+
+To illustrate the power and flexibility of this approach, we have included a
+ShinyApp together with the R code that can replicate some of the analysis
+presented, reachable online at http://lvegro.shinyapps.io/shiny. A screenshot
+of how the webpage looks is presented in \autoref{shiny_screen}. Note that
+no HTML or CSS knowledge is required to produce such an output.
+
+![A screenshot of the author's **shiny** app \label{shinyscreen}](images/shiny_screen.png)
+
+Even if not all the analyses performed in the following are implemented in the
+**shiny** dashboard, we cannot stress enough how easy it is to 
+transform a working R script into a rudimentary but functional webapp. In fact
+even for a proficient R programmer building a ShinyApp might be a less time
+consuming task that repeating the same analysis over and over, only adjusting 
+one or two parameters at a time.
+
+The advantages of integrating shiny in explorative analysis workflow in R
+are twofold: for the analyst there is the possibility of presenting
+any result that can be implemented in R in an interactive way, including
+cutting-edge methods that may not be yet implemented in specific software tools.
+This way, customized solution may be sought out even by those with just a modicum 
+of R programming ability. The consumer of information in the other hand can 
+compare on his own different directions of analysis, and the results are presented
+effectively in a way that furthers understanding of the relevant phenomena.
+
+We found a **shiny** app to be a very effective approach in the preliminary 
+exploration of the data, as it allows certain connection to become visually 
+obvious and  is significantly faster than when writing 
+the code directly in the R console.

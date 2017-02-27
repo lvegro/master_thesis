@@ -1,0 +1,485 @@
+---
+output: pdf_document
+---
+
+# A primer on graphs
+
+In this first chapter, we will introduce fundamental graph terminology
+focusing on those aspects most relevant to the monitoring and statistical
+analysis
+of social networks. When monitoring people interacting with one
+another, as graphs provide a natural framework to represent
+communication patterns. For a comprehensive review of the topic, see the paper
+from @townshend2012review, where the material presented in this chapter is further
+expanded upon.
+
+## Basic definitions
+
+A or *graph* $G$ is a mathematical object consisting
+of two related components: a *vertex set* $V = (v_1, \ldots, v_n)$
+where each vertex represents an individual and an *edge set* $E \in V
+\times V$ that contains all pairs of vertices $(v_i, v_j)$ such that
+there is an edge between $v_i$ and $v_j.$. We therefore can write $G= (V,E)$.
+If there exists an edge that connects a pair of vertices $v_i$ and $v_j$,
+with $i, j \in (1, \ldots, n)$ and $i \ne j$, then
+$v_i$ and $v_j$ are said to be in contact. We can indicate the edge connecting
+$i$ and $j$ by $e_{ij}$.
+
+A graph can be represented visually in numerous way, most commonly by
+plotting a point for each element of the vertex set and connecting the
+pairs in the edge set with lines. This is the so-called "node-link" layout.
+ 
+```{r, echo = FALSE, message=FALSE, fig.cap="\\label{sample_graph}A graph shown in a directed and undirected version"}
+library(igraph)
+library(xtable)
+set.seed(3213)
+gsam <- erdos.renyi.game(6, .20, directed=T)
+g <- lapply(1:5, function(i) erdos.renyi.game(n=12, p=.31, directed = T))
+par(mfrow=c(1,2))
+set.seed(1)
+plot(gsam, vertex.color="light grey", edge.color="black", vertex.label="",
+     edge.width=2, edge.arrow.size=0)
+set.seed(1)
+plot(gsam, vertex.color="light grey", edge.color="black", vertex.label="",
+     edge.width=2, edge.arrow.size=.8)
+```
+
+In the case of a network of communications within a social group,
+there will be an edge between two vertices if there was at least a
+contact between them, or if some other condition defining the
+existence of a contact is satisfied.  The *order* of a graph is the
+number of vertices it contains and its *size* is the number of edges
+between those vertices.
+
+If the definition of contact allows to distinguish the direction of
+communication, so that contacts initiated by $v_i$ toward $v_j$ are
+considered different from those from $v_j$ to $v_i$ the graph is said
+to be *directed*. If this is not true it is *undirected* so that in general
+in an undirected graph $e_{ij} = e_{ji}$. Graphically, such directional
+connections can be represented by adding arrows to edges, indicating 
+the origin and the destination of the contact.
+In \autoref{sample_graph} we can observe a simple graph with six vertices
+and six edges shown 
+both in a directed and undirected version.
+
+A *simple* graph does not contain multiple edges between vertices or 
+edges that start and end at the same node. A graph can further be
+characterized on the basis of its connectedness. The *edge density* of
+a graph is the ratio of its size to the number of possible edges. A
+graph is said to be *complete* when it is simple, undirected and every
+pair of distinct vertices is connected by a unique edge.
+
+A *path* of length $k$ between vertices $v_i$ and $v_k$ is a set of
+edges $P=(p_1, \ldots, p_k) \in E$ that one can follow to go from
+$v_i$ to $v_k$ passing through other vertices. A *geodesic* is the
+shortest of all possible paths between a pair of vertices. In this view the geodesic
+comes to represent a proxy of the *distance* between two vertices. The longest
+graph geodesic in a graph is the graph's *diameter*.
+
+A sub-graph $G^s = (V^s, E^s)$ of $G$ is a smaller graph whose vertex
+and edge sets are proper subsets of $V$ and $E$. Of particular
+interest in the field of social network analysis are complete
+sub-graphs. The set of vertices of a complete sub-graph is called a
+*clique*. Cliques come to represent, in this context, groups of people
+who all know each other. In \autoref{clique_geo} we highlighted the presence
+of a clique in the same graph shown \autoref{samplegraph}.
+
+```{r, message=F, echo = F, fig.align= 'center',fig.scap='Cliques and labelled components', fig.cap="\\label{clique_geo}Left, he same graph as above, with a clique highlighed in red. Right, with weighted edges represented by varying widths"}
+par(mfrow=c(1,2))
+set.seed(1)
+plot(gsam,
+     vertex.color=c("indian red", "light grey", "light grey", "indian red", "indian red", "light grey"),
+     vertex.label="",
+     edge.color="black",
+     edge.width=2, edge.arrow.size=0)
+set.seed(1)
+plot(gsam,
+     vertex.color='light grey',
+     vertex.label=c(1:6),
+     vertex.label.color='black',
+     vertex.label.cex=.8,
+     edge.color="black",
+     edge.width=c(2,1, 2, 3, 6, 1), edge.arrow.size=0)
+
+```
+
+This example shows how 
+vertices and edges of a graph can be labeled, coupling them with one or
+more attributes that specifies some quantitative or qualitative
+characteristic. For example, the vertices could be labeled with names
+or email addresses and the edges with time of connection or mode of
+communication. If the communication between individuals takes discrete
+values one can specify a set of *edge weights* in a one-to-one
+relationship with the elements of $E$ that can be regarded as edge
+attributes. In this case the graph is said to be *weighted*, otherwise
+it is *unweighted*.
+
+The information necessary for the representation of an undirected
+graph can be embedded in an *adjacency matrix* $A = |a_{ij}|$. In the
+case of an unweighted simple graph with undirected edges $a_{ij}$
+takes value $1$ if there is an edge between vertices $v_i$ and $v_j$
+and $0$ otherwise. If the graph is undirected, then the adjacency matrix
+is of course symmetrical.
+
+As an example, this is the adjacency matrix that characterizes the graph we 
+used in the plots above:
+
+\[
+A = 
+ \begin{pmatrix}
+ 0 & 0 & 1 & 1 & 0 & 0 \\ 
+ 0 & 0 & 0 & 0 & 0 & 0 \\ 
+ 0 & 0 & 0 & 1 & 0 & 1 \\ 
+ 0 & 0 & 0 & 0 & 0 & 1 \\ 
+ 1 & 1 & 0 & 1 & 0 & 0 \\ 
+ 1 & 0 & 0 & 0 & 0 & 0 \\ 
+ \end{pmatrix}
+\]
+
+Note that most elements of the matrix are $0$. This is common in real world
+application of graphs, and matrices with this characteristic are said to be
+*sparse*. Sparsity generates computational problems because on very large sparse
+matrices most algorithms are inefficient, as a lot of computations must be wasted
+on null elements.
+
+## Centrality measures
+
+The *degree* of a vertex $v_i$ is the number of edges incident on
+$v_i$, i.e. the number of connections of $v_i$ to other vertices.
+We will indicate the degree of vertex $v_i$, $i \in (1, \ldots, n)$ with
+$d_i$. Note that in a simple undirected graph, with unweighted edges, the degree
+of vertex $v_i$ can be obtained by summing all the values in the $i$-th row
+of the adjacency matrix $A$:
+
+$$
+d_i = \sum_{j=1}^n a_{ij}
+$$
+If the graph is directed, it is possible to decompose the *total degree*
+of a vertex in its *in-degree* (number of incoming connection) and of
+its *out-degree* (number of outgoing connections). The degree of a
+vertex is also the simplest measure of its *centrality*, meaning of
+its relative importance in the network. In this sense centrality can
+be seen as a summary statistic of each vertex, describing synthetically
+it's characteristics relative to the entire network. Moreover, extension of
+the centrality concept have been proposed which allow for an assesment of
+the degree of **"centralness"** of the entire network.
+
+In a seminal paper published in 1978, Freeman [@freeman1978centrality]
+distinguishes between three distinct conceptions of centrality each with
+an intuitive interpretation and a separate set of measures, that can be
+normalized so to enable comparisons between different networks. Building
+on these measures of node centrality Freeman also tackled the problem of
+conceptualizing overall network centrality, and proposed three different
+measures that mirrored the intuition behind those for point centrality
+and are computed leveraging differences of point centralities.
+
+Several definitions of centrality have been proposed, each embodying a
+different concept useful for social network analysis. We will now
+review the definitions of centrality employed in this work,
+emphasizing the correspondence between usual, *single node* centrality
+and *full network* centrality statistics.
+
+With this in mind, it becomes clear that any numeric
+summarization of a complex object such as a graph can serve as a measure,
+if a given characteristic of interest is identified and a reliable way
+to express it is found.
+
+### Degree centrality
+
+The earliest and most immediate way to conceptualize the structural
+importance of a vertex is to think of it as a function of its
+connectednes, i.e. of its degree. In a communication network, a vertex
+with high degree can be though of as a "hub" of information flow within
+the network. Social actors having many contact with the other member
+of the network will see themselves as structurally important and, at
+the other end of the spectrum, those with low degrees will be aware of
+their peripheral role in the network. In this sense degree centrality
+can be seen as an expression of ``popularity'' of an actor.
+
+An appropriate measure to represent this view of centrality will therefore
+be the vertex degree exactly as it has been defined above:
+
+$$ C_D(v_k) = \sum_{j=1}^n {a_{ij}} $$
+
+A normalized version of this measure can be immediately deduced observing
+that in a simple graph with $n$ vertices the highest possible degree is
+$n-1$ so that the normalized measure is
+
+$$ C'_D(v_k) =  \frac{d_k}{n-1} $$
+
+The graph-wide form of any measure of centrality 
+was formalized by @freeman1978centrality as a ratio between a sum of
+differences in point centrality values and the maximum possible value
+these differences can take.
+
+Thus the definition of degree centrality defined above can be also
+generalized to express the "centralness" of the whole graph. To this aim, let
+$n$ indicate the number of vertices, $C_D(v_i)$ indicate the degree centrality
+(not normalized) of the $i$-th vertex and $C_D(v_*)$ be the largest value of 
+degree centrality for any vertex in the network. Equivalent conventions
+will apply to betweenness and closeness centrality measures.
+
+The whole graph's degree centrality can then be expressed as:
+$$ C_D = \frac{\sum_{i=1}^n \left( C_D(v_*) - C_D(v_i) \right) }{n^2 - 3n + 2} $$
+The denominator $n^2 - 3n + 2$ is equal to the highest possible value the degree
+centrality index just defined can take.
+
+For this reason, any graph-wide version have range from $0$ to $1$;
+the value of the index will be
+higher the more a network is centralized, and will have lower values as
+the network becomes more and more "distributed", finally reaching zero
+only when all vertices have the same centrality value.
+
+In general the highest possible value for any centrality measures
+is observed in graph that present a star-like structure,
+like the one represented in \autoref{figstar}.
+node 
+
+### Betweenness centrality
+
+Intuitively, betweenness centrality refers to the situation where a
+vertex is strategically located along the paths that lead to many other
+vertices and, in a communication setting, the actor in that position will
+then have a greater potential for controlling the flow of information, so
+that actors with high betweenness are those who can act as gateways,
+regulating how informations spreads to other people.
+
+Let $\# g_{ij}$ be the number of geodesic that connect points $i$ and
+$j$ and $g_{ij}(v_k)$ the number of geodesics that contain the $k$-th
+vertex. Assuming the path that information must follow to go from $v_i$
+to $v_j$, we can think of the ratio
+
+$$ b_{ij}(v_k) = \frac{g_{ij}(v_k)}{g_{ij}} $$
+
+as the probability that a path containing $v_k$ will be chosen. A
+measure of betweenness centrality can be obtained by summing all partial
+betweenness values:
+
+$$ C_B(v_k) = \sum_{i<j}^n {b_{ij}}(v_k) $$
+
+Using results in \cite{freeman1978centrality} it can be shown that a
+version of the same measure independent of the size of the network is
+
+$$ C'_B(v_k) = \frac{2\sum_{i<j}^n {b_{ij}}(v_k)}{n^2 - 3n + 2} $$
+
+and the corresponding measure of whole-graph betweenness is
+
+$$ C_B = \frac{\sum_{i=1}^n C_B(v_*) - C_B(v_i)}{n^3 -4n^2 +5n -2} $$
+
+### Closeness centrality
+
+Within the communication network context, a point is considered close to
+others if it can pass on information directly without having to relay
+it through other points. In this sense, closeness can be considered as
+a sort of antithesis of betweenness: if betweennes implies the potential
+for control of the flow of information, closeness indicates indipendence
+from that control. We can regard an actor with as close to many other
+when he or she can spread information quickly and reliable, as it can
+avoid to rely on other actors to communicate.
+
+Initially introduced by Sabidussi [@sabidussi1966centrality], the
+simplest and most effective closeness centrality measure is inversely
+proportional to the geodesic distance of that vertex to all other
+vertices, as follows:
+
+$$ C_{C}(v_k) = \frac{1}{\sum_{i=1}^n d(v_i, v_k)} $$
+
+where $d(v_i, v_k)$ is the length of the geodesic path from $i$ to $k$;
+as usual a normalized version of the same measure can be obtained by
+dividing $C_C{v_K}$ by a suitable integer, and in this case:
+
+$$ C_{C}(v_k) = \frac{n - 1}{\sum_{i=1}^n d(v_i, v_k)} $$
+
+$$ C_C = \frac{\sum_{i=1}^n C_C(v_*) - C_C(v_i)}{(n^2 -3n + 2)/(2n - 3)} $$
+
+
+
+```{r figstar, echo=F, message=F, fig.align='center', message=FALSE, fig.scap = "Visual display of centrality measures", fig.cap="\\label{figstar}Visualizing central nodes with different measures: from left to right: Degree, Betweenness, Closeness ", outwidth=".75\\linewidth"}
+par(mfrow=c(1,3))
+g <- igraph::graph_from_edgelist(matrix(data = c(1,5,
+                                               2,5,
+                                                3,5,
+                                                4,5,
+                                               6,5,
+                                               7,5), ncol=2, byrow = T), directed = F)
+g2 <- igraph::graph_from_adjacency_matrix(matrix(c(0,0,0,1,0,
+                                           0,0,0,1,0,
+                                           0,0,0,0,1,
+                                           0,0,0,0,1,
+                                           0,0,1,1,0), byrow = T, ncol=5))
+g2 <- igraph::graph_from_literal(A-+C, B-+C, C-+D, E-+D, G-+D, H-+G, I-+G)
+g3 <- igraph::graph_from_literal(A-+C, B-+C, D-+C, C-+E, C-B, B-D)
+colornodes <- c(rep('light grey', 4), 'indian red', rep('light grey', 2))
+plot(g, vertex.color=colornodes, vertex.label='', edge.color='black', edge.width=2, main="")
+colornodes <- c(rep('light grey', 3), 'indian red', rep('light grey', 3))
+plot(g2, vertex.color=colornodes, vertex.label='', edge.color='black', edge.width=2, main="",edge.arrow.width=0)
+colornodes <- c("indian red", 'light grey', 'indian red', 'indian red', 'light grey')
+plot(g3, vertex.color=colornodes, vertex.label='', edge.color='black', edge.width=2, main="",edge.arrow.width=.7)
+```
+
+## Comparing different graphs
+
+As we have seen, graph data is a canonical example of an high dimensional
+non euclidean data sets. Let $G_1 = (V_1, E_1) $ and $G_2 = (V_2, E_2)$
+be two different graphs. To quantify the similarity between two graph, it is 
+desirable to define a similarity function $S$, ranging form $0$ to $1$, that
+captures intuition well. The requirement cannot be as stringent as for distance
+functions, that must also satisfy the triangle inequality, because of the lack
+of well defined vector operations on graphs. Among the proposals advanced in the
+literature, two main categories are of particular interest for this work's scope
+because of their relative ease of implementation: *graph edit distance* and *feature extraction*.
+
+### Edit distance
+The graph edit distance  is a generalization of the graph isomorphism problem, where the target
+is to transform one graph to the other by doing a number of operations (additions, deletions, substitution).
+Each operation can be assigned a different weight, to express the cost of each operation.
+The cost of a specific sequence of operations that trasforms $G_1$ into $G_2$ is
+then the sum of all the operation's costs.
+The graph edit distance is then taken to be the minimum total cost among all possible
+operation sequences.
+
+The problem with these algorithms lays with their computational complexity,
+as they run in exponential times and are therefore practically unusable for the
+very large graphs which are of interest today. On limited hardware, even
+a medium-sized graph could take a very long time to be analyzed.
+
+A naive similarity measure between
+simple, unweighted graphs can be
+computed simply by counting the number of different edges.
+Let $A_i$ be the adjacency matrix of $G_i$, $i \in (1,2)$ and
+Let $l_i$ represent the vectorized form of $A_i$:
+then our first dissimilarity measure is
+
+$$
+d_1 = || l_1 - l_2 ||_1 = || l_1 - l_2 ||^2_2
+$$
+This can be transformed to a normalized measure (which ranges from $0$ to $1$)
+simply scaling it by the sum of the number of edges, squared, of both graphs:
+
+$$
+d_2 = \frac{ || v_1 - v_2 ||^2_2}
+{\sqrt{\sum{v_1}+ \sum{v_2}}}
+$$
+
+### Feature extraction
+
+The key intuition behind these methods is that similar graphs probably share certain
+characteristic, such as degree distribution, average centrality measure, diameter.  After extracting these features, a
+similarity measure is applied in order to assess the similarity between the summary statistics and,
+equivalently, the similarity between the graphs.
+
+These methods are powerful and scale well, as they
+map the graphs to several statistics thus lowering considerably the dimensionality of the graphs.
+However, depending on the statistics that are chosen, it is possible to get results that are not intuitive [@watts1999small].
+
+## Graphical representations
+
+The relative position in which the vertices of a graph are plotted are to some extent arbitrary.
+Various methods have been proposed to enhance the readability of the
+graphs depending on the phenomena that are object of attention and must be highlighted,
+so that the purpose of the representation can serve as a guide to determine
+which layout to use. In \autoref{layout} we show different way to plot the
+same graph with the node-edge method.
+
+```{r, echo=F, fig.scap="Different layouts of the same graph", fig.cap="\\label{layout} The same graph shown in three different layouts"}
+par(mfrow=c(1,3))
+plot(gsam,
+     vertex.color="light grey",
+     vertex.label.color='black',
+     vertex.label.cex=.8,
+     edge.color="black",
+     edge.width=2, edge.arrow.size=0)
+igraph::plot.igraph(gsam,
+            vertex.color="light grey",
+     vertex.label.color='black',
+     vertex.label.cex=.8,
+     edge.color="black",
+     edge.width=2, edge.arrow.size=0,
+     layout=layout_in_circle(gsam))
+igraph::plot.igraph(gsam,
+            vertex.color="light grey",
+     vertex.label.color='black',
+     vertex.label.cex=.8,
+     edge.color="black",
+     edge.width=2, edge.arrow.size=0,
+     layout=layout.grid(gsam))
+```
+
+Attributes related to the vertices or the edge, for example categorical variables
+are generally represented by varying the color or size of the graphical element.
+One could for example represent the sex or profession of the social actors by
+different color or highlighting frequent connection by increasing the
+thickness of the lines.
+
+Planar representation of graphs are complicated because they intrinsically
+flatten a multidimensional object. This can be seen as similar to
+the problem of representing a territory on a bi-dimensional maps. Terrain features
+such as mountains and depression must be represented by contour lines, different
+kinds of soil are usually indicated by colors, and the presence of particular
+landmarks calls for the usage of a series of symbol.
+
+Moreover, when considering geographical maps, it's easy to draw a parallel to
+the representations known as *choropleth maps*. In \autoref{complexity2}, for example,
+we try to show how  additional variables can make the visualization of an otherwise simple
+graph very complicated.
+
+```{r complexity2, echo = F, message=F, fig.scap="Complexity in graph representations", fig.cap="\\label{complexity2}Left, a simple graph. Right, the same graph structure with additional categorical variables results in a more complex representation"}
+library(igraph)
+library(RColorBrewer)
+set.seed(23394)
+comg <- erdos.renyi.game(9, p.or.m=.43)
+V(comg)$c1 <- sample(x = brewer.pal(n = 6, "Pastel1"), size = 9, replace = T)
+V(comg)$c2 <- sample(x = c("circle", "square"), size = 9, replace=T)
+E(comg)$co <- sample(x = c("dark red", "light blue", "black"), size=9, replace=T)
+E(comg)$c1 <- sample(1:3,  size = 9, replace=T)
+par(mfrow=c(1,2))
+set.seed(1)
+plot.igraph(comg, 
+             vertex.color="light grey",
+            vertex.label="",
+     vertex.label.color='black',
+     vertex.label.cex=.8,
+     edge.color="black",
+     edge.width=2, edge.arrow.size=0)
+set.seed(1)
+ plot.igraph(comg,
+             vertex.color=V(comg)$c1,
+            vertex.shape=V(comg)$c2,
+     vertex.label.color='black',
+     vertex.label.cex=.8,
+     edge.color=E(comg)$co,
+     edge.width=E(comg)$c1, edge.arrow.size=0)
+             
+```
+
+
+The abundance of possible dimension of analysis therefore represent a significant challenge
+for visualization. The problem has been tackled from several viewpoints in academic literature:
+too make phenomenon of interest clearer, one can choose to cluster several vertices into one,
+to displace edges in order to reduce the visual clutter and avoid the "ball of yarn" phenomenon.
+This refers to the fact that, in a very large graph, the number of connection is so great
+that the link-node representation ends up resembling a inextricable tangle, so that
+any meaningful connection is lost to the viewer.
+
+In most cases, a "one size fits all" approach will not be fruitful, however. The number
+of concurring phenomena will be so great that any single representation, no matter
+well designed, cannot be exhaustive. Therefore, several interactive system have been
+developed to enable the analyst or the 'consumer' of the graph to drill
+down on the specific aspect that is of interest. These system generally include
+a way to hide specific nodes and edges depending on their characteristics, thereby
+making the graph clearer, as well as selectively showing some other characteristic
+of the nodes or of their connection by the use of colors, symbols and so on.
+
+The difficult task of representing a sizable graph is further complicated when
+we consider temporal graphs (see next chapter). 
+These data structures, also called dynamic graphs represent a novel data form made
+available only in recent times due to the abundance of sensor and communication data
+now possible because of technological evolution.
+
+The challenges they pose
+with respect to the visualization of networks are several, and solutions are still
+being explored. An interesting avenue for interactive visualization is the production
+of animated display (such as sequenced images or real digital videos) to enable the
+viewer to observe the evolution of the network. As will become obvious
+in the rest of this work, the analytic approach to the same problem is much more
+complicated and nuanced.

@@ -1,0 +1,5 @@
+---
+output: pdf-document
+---
+
+All this thesis is hosted in the github repository at the following URL
